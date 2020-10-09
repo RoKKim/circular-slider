@@ -55,6 +55,7 @@ class Slider {
         this.options.container.appendChild(this.svg);
 
         this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+        this.svg.addEventListener("touchstart", this.onTouchStart.bind(this), false);
     }
 
     setStep() {
@@ -70,17 +71,27 @@ class Slider {
         }
     }
 
-    onMouseMove(e) {
+    onMove(e) {
         e.preventDefault();
 
         let svgRect = this.svg.getBoundingClientRect();
-        // clientX, clientY tell us the current position of the mouse, we need relative position to the center of svg
+
         let coords = {
-            x: e.clientX - (Math.floor(svgRect.left) + this.options.radius),
-            y: (Math.floor(svgRect.top) + this.options.radius) - e.clientY
+            x: 0,
+            y: 0
         };
+        // instead of the current position of the pointer we need relative position to the center of svg
+        if (e.type === 'touchmove') {
+            coords.x = e.touches[0].clientX;
+            coords.y = e.touches[0].clientY;
+        } else if (e.type === 'mousemove') {
+            coords.x = e.clientX;
+            coords.y = e.clientY;
+        }
+
         // range (-180, 180)
-        let angle = Math.atan2(coords.x, coords.y) * 180 / Math.PI;
+        let angle = Math.atan2(coords.x - (Math.floor(svgRect.left) + this.options.radius),
+            (Math.floor(svgRect.top) + this.options.radius) - coords.y) * 180 / Math.PI;
         // range (0, 360)
         if (angle < 0) {
             angle += 360;
@@ -99,11 +110,10 @@ class Slider {
 
     onMouseDown(e) {
         e.preventDefault()
-        this.svg.setAttribute('style', 'pointer-events: auto;');
 
         // using a pointer to grab the exact listener upon removal
-        this.boundMouseMove = this.onMouseMove.bind(this);
-        document.body.addEventListener("mousemove", this.boundMouseMove, false);
+        this.boundMove = this.onMove.bind(this);
+        document.body.addEventListener("mousemove", this.boundMove, false);
         this.boundMouseUp = this.onMouseUp.bind(this);
         document.body.addEventListener("mouseup", this.boundMouseUp, false);
     }
@@ -111,12 +121,29 @@ class Slider {
     onMouseUp(e) {
         e.preventDefault();
 
-        document.body.removeEventListener('mousemove', this.boundMouseMove)
+        document.body.removeEventListener('mousemove', this.boundMove)
         document.body.removeEventListener('mouseup', this.boundMouseUp)
+    }
+
+    onTouchStart(e) {
+        e.preventDefault()
+
+        // using a pointer to grab the exact listener upon removal
+        this.boundMove = this.onMove.bind(this);
+        document.body.addEventListener("touchmove", this.boundMove, { passive: false });
+        this.boundTouchEnd = this.onTouchEnd.bind(this);
+        document.body.addEventListener("touchend", this.boundTouchEnd, false);
+    }
+
+    onTouchEnd(e) {
+        e.preventDefault();
+
+        document.body.removeEventListener('touchmove', this.boundMove)
+        document.body.removeEventListener('touchend', this.boundTouchEnd)
     }
 }
 
-slider = new Slider({
+slider1 = new Slider({
     container: document.getElementById('container'),
     color: 'red',
     min: 0,
@@ -124,4 +151,4 @@ slider = new Slider({
     step: 30,
     radius: 200
 });
-slider.init();
+slider1.init();
