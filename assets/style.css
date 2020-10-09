@@ -1,0 +1,11 @@
+.value_backdrop, .value_holder {
+    stroke: #d7d7d7;
+}
+
+.value_backdrop, .value_progress {
+    fill: none;
+}
+
+.value_holder {
+    fill: white;
+}
