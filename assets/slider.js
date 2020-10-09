@@ -10,14 +10,17 @@ class Slider {
     }
 
     init() {
-        this.draw();
+        this.drawSlider();
+        this.createLabel();
         // setting the initial step
         this.setStep();
     }
 
-    draw() {
+    drawSlider() {
         let strokeWidth = 22;
         let strokeWidthHolder = 1.8;
+        let dashWidth = 1.4;
+
         // actual circle radius, since the options one doesnt not factor in radius
         this.circleRadius = this.options.radius - strokeWidth / 2;
         // circumference of the circle based on the actual radius
@@ -29,13 +32,9 @@ class Slider {
         this.svg.setAttribute('height', this.options.radius * 2);
         this.svg.setAttribute('width', this.options.radius * 2);
         this.svg.setAttribute('viewBox', `0 0 ${this.options.radius * 2} ${this.options.radius * 2}`);
-
-        this.valueBackdrop = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this.valueBackdrop.setAttribute('class', 'value_backdrop');
-        this.valueBackdrop.setAttribute('d',
-            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
-        this.valueBackdrop.setAttribute('stroke-width', strokeWidth)
-        this.svg.appendChild(this.valueBackdrop);
+        // pointer event will be only triggered on the stroke of svg
+        this.svg.style.pointerEvents = 'stroke';
+        this.options.container.appendChild(this.svg);
 
         this.valueProgress = document.createElementNS("http://www.w3.org/2000/svg", "path");
         this.valueProgress.setAttribute('class', 'value_progress');
@@ -46,20 +45,64 @@ class Slider {
         this.valueProgress.setAttribute('stroke-dasharray', this.circleLength);
         this.svg.appendChild(this.valueProgress);
 
+        this.valueBackdrop = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.valueBackdrop.setAttribute('class', 'value_backdrop');
+        this.valueBackdrop.setAttribute('d',
+            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
+        this.valueBackdrop.setAttribute('stroke-width', strokeWidth);
+        this.valueBackdrop.setAttribute('stroke-dasharray', `${this.stepLength - dashWidth} ${dashWidth}`);
+        this.valueBackdrop.setAttribute('stroke-dashoffset', -dashWidth / 2);
+        this.svg.appendChild(this.valueBackdrop);
+
+        /*this.valueProgressDash = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.valueProgressDash.setAttribute('class', 'value_progress_dash');
+        this.valueProgressDash.setAttribute('d',
+            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
+        this.valueProgressDash.setAttribute('stroke-width', strokeWidth);
+        this.valueProgressDash.setAttribute('stroke-dasharray', `${dashWidth} ${this.stepLength - dashWidth}`);
+        this.valueProgressDash.setAttribute('stroke-dashoffset', dashWidth / 2);
+        this.svg.appendChild(this.valueProgressDash);*/
+
         this.valueHolder = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         this.valueHolder.setAttribute('class', 'value_holder');
         this.valueHolder.setAttribute('r', strokeWidth / 2 - strokeWidthHolder / 2);
         this.valueHolder.setAttribute('stroke-width', strokeWidthHolder);
         this.svg.appendChild(this.valueHolder);
 
-        this.options.container.appendChild(this.svg);
-
         this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         this.svg.addEventListener("touchstart", this.onTouchStart.bind(this), false);
     }
 
+    createLabel() {
+        let labels = document.getElementById('labels');
+        let label = document.createElement("div");
+        label.setAttribute('class', 'label');
+        labels.appendChild(label);
+
+        this.value = document.createElement("div");
+        this.value.setAttribute('class', 'value');
+        this.value.innerHTML = "$";
+        label.appendChild(this.value);
+
+        this.valueSpan = document.createElement("span");
+        this.value.appendChild(this.valueSpan);
+
+        this.colorBox = document.createElement("div");
+        this.colorBox.setAttribute('class', 'color_box')
+        this.colorBox.style.backgroundColor = this.options.color;
+        label.appendChild(this.colorBox);
+
+        this.labelText = document.createElement("div");
+        this.labelText.setAttribute('class', 'label_text');
+        this.labelText.innerHTML = this.options.label;
+        label.appendChild(this.labelText);
+    }
+
     setStep() {
         this.valueProgress.setAttribute('stroke-dashoffset', this.stepLength * (this.steps - this.currentStep));
+
+        this.valueSpan.innerHTML = this.options.min + this.currentStep * this.options.step;
+
         // if this is the last step, we want to set the position of the holder at the starting point (decimal points)
         if (this.currentStep === this.steps) {
             this.valueHolder.setAttribute('transform',
@@ -109,6 +152,7 @@ class Slider {
     }
 
     onMouseDown(e) {
+        console.log("onMouseDown")
         e.preventDefault()
 
         // using a pointer to grab the exact listener upon removal
@@ -119,6 +163,7 @@ class Slider {
     }
 
     onMouseUp(e) {
+        console.log("onMouseUp")
         e.preventDefault();
 
         document.body.removeEventListener('mousemove', this.boundMove)
@@ -144,11 +189,34 @@ class Slider {
 }
 
 slider1 = new Slider({
-    container: document.getElementById('container'),
+    container: document.getElementById('sliders'),
     color: 'red',
     min: 0,
     max: 162,
-    step: 30,
-    radius: 200
+    step: 2,
+    radius: 200,
+    label: 'Transportation'
 });
 slider1.init();
+
+slider2 = new Slider({
+    container: document.getElementById('sliders'),
+    color: 'blue',
+    min: 0,
+    max: 1300,
+    step: 10,
+    radius: 165,
+    label: 'Food'
+});
+slider2.init();
+
+slider3 = new Slider({
+    container: document.getElementById('sliders'),
+    color: 'yellow',
+    min: 0,
+    max: 600,
+    step: 20,
+    radius: 130,
+    label: 'Insurance'
+});
+slider3.init();

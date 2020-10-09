@@ -1,5 +1,26 @@
-.value_backdrop, .value_holder {
-    stroke: #d7d7d7;
+.container {
+    display: flex;
+    align-items: center;
+}
+
+#sliders {
+    display: inline-block;
+}
+
+#sliders svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.value_holder {
+    stroke: #e7e7e7;
+}
+
+.value_backdrop {
+    stroke: #676767;
+    opacity: 0.3;
 }
 
 .value_backdrop, .value_progress {
@@ -8,4 +29,18 @@
 
 .value_holder {
     fill: white;
+}
+
+#labels .value {
+    text-align: right;
+    width: 150px;
+}
+
+#labels .color_box {
+    width: 15px;
+    height: 10px;
+    margin: 0 10px;
+}
+.label * {
+    display: inline-block;
 }
