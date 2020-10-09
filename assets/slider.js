@@ -54,7 +54,7 @@ class Slider {
 
         this.options.container.appendChild(this.svg);
 
-        this.svg.addEventListener("mousedown", this.onMouseDown, false);
+        this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     }
 
     setStep() {
@@ -65,27 +65,46 @@ class Slider {
     }
 
     onMouseMove(e) {
-        console.log(e)
         e.preventDefault();
+        console.log('onMouseMove')
 
-        
+        let svgRect = this.svg.getBoundingClientRect();
+
+        // clientX, clientY tell us the current position of the mouse, we need relative position to the center of svg
+        let coords = {
+            x: e.clientX - (Math.floor(svgRect.left) + this.options.radius),
+            y: (Math.floor(svgRect.top) + this.options.radius) - e.clientY
+        };
+
+        // range (-180, 180)
+        let angle = Math.atan2(coords.x, coords.y) * 180 / Math.PI;
+        // range (0, 360)
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        let currentLength = (angle / 360) * this.circleLength;
+        window.requestAnimationFrame(this.setStep.bind(this));
     }
 
     onMouseDown(e) {
-        console.log(e)
-        e.preventDefault();
+        e.preventDefault()
+        console.log('onMouseDown')
+        this.svg.setAttribute('style', 'pointer-events: auto;');
 
-        this.onMouseMove(e);
-        document.body.addEventListener("mousemove", this.onMouseMove, false);
-        document.body.addEventListener("mouseup", this.onMouseUp, false);
+        // using a pointer to grab the exact listener upon removal
+        this.boundMouseMove = this.onMouseMove.bind(this);
+        document.body.addEventListener("mousemove", this.boundMouseMove, false);
+        this.boundMouseUp = this.onMouseUp.bind(this);
+        document.body.addEventListener("mouseup", this.boundMouseUp, false);
     }
 
     onMouseUp(e) {
-        console.log(e)
         e.preventDefault();
+        console.log('onMouseUp')
 
-        document.body.removeEventListener("mousemove", this.onMouseMove, false)
-        document.body.removeEventListener("mouseup", this.onMouseUp, false);
+        document.body.removeEventListener('mousemove', this.boundMouseMove)
+        document.body.removeEventListener('mouseup', this.boundMouseUp)
     }
 }
 
