@@ -1,13 +1,24 @@
-.container {
-    display: flex;
-    align-items: center;
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap');
+
+body {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400;
+    text-align: center;
 }
 
-#sliders {
+.labels, .sliders {
     display: inline-block;
+    vertical-align: middle;
 }
 
-#sliders svg {
+.sliders {
+    height: 400px;
+    width: 400px;
+    max-width: 100%;
+    position: relative;
+}
+
+.sliders svg {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -15,32 +26,36 @@
 }
 
 .value_holder {
-    stroke: #e7e7e7;
+    stroke: #b5b5b5;
 }
 
 .value_backdrop {
-    stroke: #676767;
-    opacity: 0.3;
+    stroke: #1f1f1f;
+    opacity: 0.15;
 }
 
 .value_backdrop, .value_progress {
     fill: none;
 }
 
-.value_holder {
-    fill: white;
+.label {
+    display: flex;
+    align-items: center;
+    margin-right: 40px;
 }
 
-#labels .value {
+.label .value {
+    font-size: 1.8rem;
     text-align: right;
     width: 150px;
 }
 
-#labels .color_box {
+.label .color_box {
     width: 15px;
     height: 10px;
     margin: 0 10px;
 }
-.label * {
-    display: inline-block;
+
+.label .label_text {
+    font-size: 1rem;
 }

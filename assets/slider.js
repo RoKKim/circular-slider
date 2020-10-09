@@ -62,6 +62,29 @@ class Slider {
         this.valueHolder.style.pointerEvents = 'visiblePainted';
         this.svg.appendChild(this.valueHolder);
 
+        let objLinearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+
+        let intGradientId = 'gradient';
+        objLinearGradient.setAttribute('id', intGradientId);
+        objLinearGradient.setAttribute('x1', 1);
+        objLinearGradient.setAttribute('y1', 1);
+        objLinearGradient.setAttribute('x2', 0);
+        objLinearGradient.setAttribute('y2', 0);
+
+        let objGradientStartAt = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        objGradientStartAt.setAttribute('offset', '0%');
+        objGradientStartAt.setAttribute('stop-color', 'white');
+        objLinearGradient.appendChild(objGradientStartAt);
+
+        let objGradientEndAt = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        objGradientEndAt.setAttribute('offset', '100%');
+        objGradientEndAt.setAttribute('stop-color', '#EAEAEA');
+        objLinearGradient.appendChild(objGradientEndAt);
+
+        this.svg.appendChild(objLinearGradient);
+
+        this.valueHolder.setAttribute('fill', 'url(#' + intGradientId + ')');
+
         this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         this.svg.addEventListener("touchstart", this.onTouchStart.bind(this), false);
     }
@@ -111,11 +134,11 @@ class Slider {
         e.preventDefault();
 
         let svgRect = this.svg.getBoundingClientRect();
-
         let coords = {
             x: 0,
             y: 0
         };
+
         // instead of the current position of the pointer we need relative position to the center of svg
         if (e.type === 'touchstart' || e.type === 'touchend' || e.type === 'touchmove') {
             coords.x = e.touches[0].clientX;
@@ -190,35 +213,52 @@ class Slider {
     }
 }
 
-slider1 = new Slider({
-    container: document.getElementById('sliders'),
-    color: 'red',
-    min: 0,
-    max: 162,
-    step: 2,
-    radius: 200,
-    label: 'Transportation'
-});
-slider1.init();
+let sliders = [
+    {
+        container: document.getElementById('sliders'),
+        color: '#796087',
+        min: 0,
+        max: 162,
+        step: 2,
+        radius: 200,
+        label: 'Transportation'
+    }, {
+        container: document.getElementById('sliders'),
+        color: '#5896cb',
+        min: 0,
+        max: 1300,
+        step: 10,
+        radius: 165,
+        label: 'Food'
+    }, {
+        container: document.getElementById('sliders'),
+        color: '#62b64c',
+        min: 0,
+        max: 600,
+        step: 20,
+        radius: 130,
+        label: 'Insurance'
+    }, {
+        container: document.getElementById('sliders'),
+        color: '#f09553',
+        min: 0,
+        max: 600,
+        step: 20,
+        radius: 95,
+        label: 'Entertainment'
+    }, {
+        container: document.getElementById('sliders'),
+        color: '#f26268',
+        min: 0,
+        max: 600,
+        step: 20,
+        radius: 60,
+        label: 'Health care'
+    }
+];
 
-slider2 = new Slider({
-    container: document.getElementById('sliders'),
-    color: 'blue',
-    min: 0,
-    max: 1300,
-    step: 10,
-    radius: 165,
-    label: 'Food'
+sliders.forEach(options => {
+    let slider = new Slider(options);
+    slider.init();
 });
-slider2.init();
 
-slider3 = new Slider({
-    container: document.getElementById('sliders'),
-    color: 'yellow',
-    min: 0,
-    max: 600,
-    step: 20,
-    radius: 130,
-    label: 'Insurance'
-});
-slider3.init();
