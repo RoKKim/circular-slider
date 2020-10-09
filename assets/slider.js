@@ -32,8 +32,7 @@ class Slider {
         this.svg.setAttribute('height', this.options.radius * 2);
         this.svg.setAttribute('width', this.options.radius * 2);
         this.svg.setAttribute('viewBox', `0 0 ${this.options.radius * 2} ${this.options.radius * 2}`);
-        // pointer event will be only triggered on the stroke of svg
-        this.svg.style.pointerEvents = 'stroke';
+        this.svg.style.pointerEvents = 'none';
         this.options.container.appendChild(this.svg);
 
         this.valueProgress = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -52,21 +51,15 @@ class Slider {
         this.valueBackdrop.setAttribute('stroke-width', strokeWidth);
         this.valueBackdrop.setAttribute('stroke-dasharray', `${this.stepLength - dashWidth} ${dashWidth}`);
         this.valueBackdrop.setAttribute('stroke-dashoffset', -dashWidth / 2);
+        // pointer event will be trigger when over a stroke of backdrop object
+        this.valueBackdrop.style.pointerEvents = 'stroke';
         this.svg.appendChild(this.valueBackdrop);
-
-        /*this.valueProgressDash = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this.valueProgressDash.setAttribute('class', 'value_progress_dash');
-        this.valueProgressDash.setAttribute('d',
-            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
-        this.valueProgressDash.setAttribute('stroke-width', strokeWidth);
-        this.valueProgressDash.setAttribute('stroke-dasharray', `${dashWidth} ${this.stepLength - dashWidth}`);
-        this.valueProgressDash.setAttribute('stroke-dashoffset', dashWidth / 2);
-        this.svg.appendChild(this.valueProgressDash);*/
 
         this.valueHolder = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         this.valueHolder.setAttribute('class', 'value_holder');
         this.valueHolder.setAttribute('r', strokeWidth / 2 - strokeWidthHolder / 2);
         this.valueHolder.setAttribute('stroke-width', strokeWidthHolder);
+        this.valueHolder.style.pointerEvents = 'visiblePainted';
         this.svg.appendChild(this.valueHolder);
 
         this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
@@ -124,10 +117,10 @@ class Slider {
             y: 0
         };
         // instead of the current position of the pointer we need relative position to the center of svg
-        if (e.type === 'touchmove') {
+        if (e.type === 'touchstart' || e.type === 'touchend' || e.type === 'touchmove') {
             coords.x = e.touches[0].clientX;
             coords.y = e.touches[0].clientY;
-        } else if (e.type === 'mousemove') {
+        } else if (e.type === 'mousedown' || e.type === 'mouseup' || e.type === 'mousemove') {
             coords.x = e.clientX;
             coords.y = e.clientY;
         }
@@ -152,36 +145,45 @@ class Slider {
     }
 
     onMouseDown(e) {
-        console.log("onMouseDown")
-        e.preventDefault()
+        e.preventDefault();
+        // we want the mouseup event to trigger anywhere on svg
+        this.svg.style.pointerEvents = 'visiblePainted';
 
         // using a pointer to grab the exact listener upon removal
         this.boundMove = this.onMove.bind(this);
         document.body.addEventListener("mousemove", this.boundMove, false);
         this.boundMouseUp = this.onMouseUp.bind(this);
         document.body.addEventListener("mouseup", this.boundMouseUp, false);
+
+        // in case the pointer doesnt move, we want to trigger it manually
+        this.onMove(e);
     }
 
     onMouseUp(e) {
-        console.log("onMouseUp")
         e.preventDefault();
+        // after mouse is up, we once again only want to trigger pointer on stroke of backdrop
+        this.svg.style.pointerEvents = 'none';
 
         document.body.removeEventListener('mousemove', this.boundMove)
         document.body.removeEventListener('mouseup', this.boundMouseUp)
     }
 
     onTouchStart(e) {
-        e.preventDefault()
+        e.preventDefault();
+        this.svg.style.pointerEvents = 'visiblePainted';
 
         // using a pointer to grab the exact listener upon removal
         this.boundMove = this.onMove.bind(this);
         document.body.addEventListener("touchmove", this.boundMove, { passive: false });
         this.boundTouchEnd = this.onTouchEnd.bind(this);
         document.body.addEventListener("touchend", this.boundTouchEnd, false);
+
+        this.onMove(e);
     }
 
     onTouchEnd(e) {
         e.preventDefault();
+        this.svg.style.pointerEvents = 'none';
 
         document.body.removeEventListener('touchmove', this.boundMove)
         document.body.removeEventListener('touchend', this.boundTouchEnd)
