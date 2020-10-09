@@ -53,13 +53,40 @@ class Slider {
         this.svg.appendChild(this.valueHolder);
 
         this.options.container.appendChild(this.svg);
+
+        this.svg.addEventListener("mousedown", this.onMouseDown, false);
     }
 
     setStep() {
         this.valueProgress.setAttribute('stroke-dashoffset', this.stepLength * (this.steps - this.currentStep));
         // getPointAtLength returns the point at a given distance along the path
         this.valueHolder.setAttribute('transform',
-            `translate(${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).x},${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).y})`);    };
+            `translate(${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).x},${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).y})`);
+    }
+
+    onMouseMove(e) {
+        console.log(e)
+        e.preventDefault();
+
+        
+    }
+
+    onMouseDown(e) {
+        console.log(e)
+        e.preventDefault();
+
+        this.onMouseMove(e);
+        document.body.addEventListener("mousemove", this.onMouseMove, false);
+        document.body.addEventListener("mouseup", this.onMouseUp, false);
+    }
+
+    onMouseUp(e) {
+        console.log(e)
+        e.preventDefault();
+
+        document.body.removeEventListener("mousemove", this.onMouseMove, false)
+        document.body.removeEventListener("mouseup", this.onMouseUp, false);
+    }
 }
 
 slider = new Slider({
