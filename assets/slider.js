@@ -64,7 +64,7 @@ class Slider {
 
         let objLinearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
 
-        let intGradientId = 'gradient';
+        let intGradientId = 'gradient' + Math.floor(Math.random() * 10000);
         objLinearGradient.setAttribute('id', intGradientId);
         objLinearGradient.setAttribute('x1', 1);
         objLinearGradient.setAttribute('y1', 1);
