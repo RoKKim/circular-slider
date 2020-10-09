@@ -59,31 +59,41 @@ class Slider {
 
     setStep() {
         this.valueProgress.setAttribute('stroke-dashoffset', this.stepLength * (this.steps - this.currentStep));
-        // getPointAtLength returns the point at a given distance along the path
-        this.valueHolder.setAttribute('transform',
-            `translate(${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).x},${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).y})`);
+        // if this is the last step, we want to set the position of the holder at the starting point (decimal points)
+        if (this.currentStep === this.steps) {
+            this.valueHolder.setAttribute('transform',
+                `translate(${this.valueBackdrop.getPointAtLength(0).x},${this.valueBackdrop.getPointAtLength(0).y})`);
+        } else {
+            // getPointAtLength returns the point at a given distance along the path
+            this.valueHolder.setAttribute('transform',
+                `translate(${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).x},${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).y})`);
+        }
     }
 
     onMouseMove(e) {
         e.preventDefault();
 
         let svgRect = this.svg.getBoundingClientRect();
-
         // clientX, clientY tell us the current position of the mouse, we need relative position to the center of svg
         let coords = {
             x: e.clientX - (Math.floor(svgRect.left) + this.options.radius),
             y: (Math.floor(svgRect.top) + this.options.radius) - e.clientY
         };
-
         // range (-180, 180)
         let angle = Math.atan2(coords.x, coords.y) * 180 / Math.PI;
         // range (0, 360)
         if (angle < 0) {
             angle += 360;
         }
-
         let currentLength = (angle / 360) * this.circleLength;
-        this.currentStep = Math.floor(length / this.stepLength) + 1;
+
+        // to ease resetting the value, we allow some buffer at step 0
+        if (this.circleLength - this.stepLength / 20 < currentLength || currentLength < this.stepLength / 20) {
+            this.currentStep = 0;
+        } else {
+            this.currentStep = Math.floor(currentLength / this.stepLength) + 1;
+        }
+
         window.requestAnimationFrame(this.setStep.bind(this));
     }
 
@@ -110,8 +120,8 @@ slider = new Slider({
     container: document.getElementById('container'),
     color: 'red',
     min: 0,
-    max: 150,
-    step: 50,
+    max: 162,
+    step: 30,
     radius: 200
 });
 slider.init();
