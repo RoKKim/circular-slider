@@ -3,7 +3,7 @@ class Slider {
         this.options = options
         // calculating number of steps in a circle
         this.steps = Math.floor((this.options.max - this.options.min) / this.options.step);
-        this.currentStep = this.options.step;
+        this.currentStep = 0;
         this.stepLength = 0;
         this.circleRadius = 0;
         this.circleLength = 0;
@@ -20,7 +20,7 @@ class Slider {
         let strokeWidthHolder = 1.8;
         // actual circle radius, since the options one doesnt not factor in radius
         this.circleRadius = this.options.radius - strokeWidth / 2;
-        // length of the circle based on the actual radius
+        // circumference of the circle based on the actual radius
         this.circleLength = 2 * Math.PI * this.circleRadius;
         this.stepLength = this.circleLength / this.steps;
 
@@ -66,7 +66,6 @@ class Slider {
 
     onMouseMove(e) {
         e.preventDefault();
-        console.log('onMouseMove')
 
         let svgRect = this.svg.getBoundingClientRect();
 
@@ -84,12 +83,12 @@ class Slider {
         }
 
         let currentLength = (angle / 360) * this.circleLength;
+        this.currentStep = Math.floor(length / this.stepLength) + 1;
         window.requestAnimationFrame(this.setStep.bind(this));
     }
 
     onMouseDown(e) {
         e.preventDefault()
-        console.log('onMouseDown')
         this.svg.setAttribute('style', 'pointer-events: auto;');
 
         // using a pointer to grab the exact listener upon removal
@@ -101,7 +100,6 @@ class Slider {
 
     onMouseUp(e) {
         e.preventDefault();
-        console.log('onMouseUp')
 
         document.body.removeEventListener('mousemove', this.boundMouseMove)
         document.body.removeEventListener('mouseup', this.boundMouseUp)
@@ -113,7 +111,7 @@ slider = new Slider({
     color: 'red',
     min: 0,
     max: 150,
-    step: 4,
+    step: 50,
     radius: 200
 });
 slider.init();
