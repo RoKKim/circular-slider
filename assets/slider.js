@@ -234,24 +234,24 @@ let sliders = [
         container: document.getElementById('sliders'),
         color: '#62b64c',
         min: 0,
-        max: 600,
-        step: 20,
+        max: 595,
+        step: 35,
         radius: 130,
         label: 'Insurance'
     }, {
         container: document.getElementById('sliders'),
         color: '#f09553',
         min: 0,
-        max: 600,
-        step: 20,
+        max: 80,
+        step: 2,
         radius: 95,
         label: 'Entertainment'
     }, {
         container: document.getElementById('sliders'),
         color: '#f26268',
         min: 0,
-        max: 600,
-        step: 20,
+        max: 2000,
+        step: 50,
         radius: 60,
         label: 'Health care'
     }
