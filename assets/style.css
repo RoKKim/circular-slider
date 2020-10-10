@@ -29,12 +29,16 @@ body {
     stroke: #b5b5b5;
 }
 
-.value_backdrop {
+.path_dash {
     stroke: #1f1f1f;
     opacity: 0.15;
 }
 
-.value_backdrop, .value_progress {
+.path_backdrop {
+    stroke: white;
+}
+
+.path_progress,.path_dash, .path_backdrop {
     fill: none;
 }
 

@@ -37,25 +37,32 @@ class Slider {
         this.svg.style.pointerEvents = 'none';
         this.options.container.appendChild(this.svg);
 
-        this.valueProgress = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this.valueProgress.setAttribute('class', 'value_progress');
-        this.valueProgress.setAttribute('d',
+        this.pathBackdrop = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.pathBackdrop.setAttribute('class', 'path_backdrop');
+        this.pathBackdrop.setAttribute('d',
             `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
-        this.valueProgress.setAttribute('stroke', this.options.color);
-        this.valueProgress.setAttribute('stroke-width', strokeWidth);
-        this.valueProgress.setAttribute('stroke-dasharray', this.circleLength);
-        this.svg.appendChild(this.valueProgress);
-
-        this.valueBackdrop = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        this.valueBackdrop.setAttribute('class', 'value_backdrop');
-        this.valueBackdrop.setAttribute('d',
-            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
-        this.valueBackdrop.setAttribute('stroke-width', strokeWidth);
-        this.valueBackdrop.setAttribute('stroke-dasharray', `${this.stepLength - dashWidth} ${dashWidth}`);
-        this.valueBackdrop.setAttribute('stroke-dashoffset', -dashWidth / 2);
+        this.pathBackdrop.setAttribute('stroke-width', strokeWidth);
         // pointer event will be trigger when over a stroke of backdrop object
-        this.valueBackdrop.style.pointerEvents = 'stroke';
-        this.svg.appendChild(this.valueBackdrop);
+        this.pathBackdrop.style.pointerEvents = 'stroke';
+        this.svg.appendChild(this.pathBackdrop);
+
+        this.pathProgress = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.pathProgress.setAttribute('class', 'path_progress');
+        this.pathProgress.setAttribute('d',
+            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
+        this.pathProgress.setAttribute('stroke', this.options.color);
+        this.pathProgress.setAttribute('stroke-width', strokeWidth);
+        this.pathProgress.setAttribute('stroke-dasharray', this.circleLength);
+        this.svg.appendChild(this.pathProgress);
+
+        this.pathDash = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        this.pathDash.setAttribute('class', 'path_dash');
+        this.pathDash.setAttribute('d',
+            `M${this.options.radius},${strokeWidth / 2} a${this.circleRadius},${this.circleRadius} 0 1,1 -1,0`);
+        this.pathDash.setAttribute('stroke-width', strokeWidth);
+        this.pathDash.setAttribute('stroke-dasharray', `${this.stepLength - dashWidth} ${dashWidth}`);
+        this.pathDash.setAttribute('stroke-dashoffset', -dashWidth / 2);
+        this.svg.appendChild(this.pathDash);
 
         this.valueHolder = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         this.valueHolder.setAttribute('class', 'value_holder');
@@ -117,18 +124,18 @@ class Slider {
     }
 
     setStep() {
-        this.valueProgress.setAttribute('stroke-dashoffset', this.stepLength * (this.steps - this.currentStep));
+        this.pathProgress.setAttribute('stroke-dashoffset', this.stepLength * (this.steps - this.currentStep));
 
         this.valueSpan.innerHTML = this.options.min + this.currentStep * this.options.step;
 
         // if this is the last step, we want to set the position of the holder at the starting point (decimal points)
         if (this.currentStep === this.steps) {
             this.valueHolder.setAttribute('transform',
-                `translate(${this.valueBackdrop.getPointAtLength(0).x},${this.valueBackdrop.getPointAtLength(0).y})`);
+                `translate(${this.pathDash.getPointAtLength(0).x},${this.pathDash.getPointAtLength(0).y})`);
         } else {
             // getPointAtLength returns the point at a given distance along the path
             this.valueHolder.setAttribute('transform',
-                `translate(${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).x},${this.valueBackdrop.getPointAtLength(this.stepLength * this.currentStep).y})`);
+                `translate(${this.pathDash.getPointAtLength(this.stepLength * this.currentStep).x},${this.pathDash.getPointAtLength(this.stepLength * this.currentStep).y})`);
         }
     }
 
