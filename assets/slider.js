@@ -7,6 +7,8 @@ class Slider {
         this.stepLength = 0;
         this.circleRadius = 0;
         this.circleLength = 0;
+
+        this.init();
     }
 
     init() {
@@ -18,10 +20,10 @@ class Slider {
 
     drawSlider() {
         let strokeWidth = 22;
-        let strokeWidthHolder = 1.8;
+        let strokeWidthHolder = 1.5;
         let dashWidth = 1.4;
 
-        // actual circle radius, since the options one doesnt not factor in radius
+        // actual circle radius, since the options one doesnt not factor in stroke
         this.circleRadius = this.options.radius - strokeWidth / 2;
         // circumference of the circle based on the actual radius
         this.circleLength = 2 * Math.PI * this.circleRadius;
@@ -62,6 +64,10 @@ class Slider {
         this.valueHolder.style.pointerEvents = 'visiblePainted';
         this.svg.appendChild(this.valueHolder);
 
+        this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+        this.svg.addEventListener("touchstart", this.onTouchStart.bind(this), false);
+
+        // adding gradient to holder
         let objLinearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
 
         let intGradientId = 'gradient' + Math.floor(Math.random() * 10000);
@@ -70,6 +76,7 @@ class Slider {
         objLinearGradient.setAttribute('y1', 1);
         objLinearGradient.setAttribute('x2', 0);
         objLinearGradient.setAttribute('y2', 0);
+        this.svg.appendChild(objLinearGradient);
 
         let objGradientStartAt = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
         objGradientStartAt.setAttribute('offset', '0%');
@@ -81,12 +88,7 @@ class Slider {
         objGradientEndAt.setAttribute('stop-color', '#EAEAEA');
         objLinearGradient.appendChild(objGradientEndAt);
 
-        this.svg.appendChild(objLinearGradient);
-
-        this.valueHolder.setAttribute('fill', 'url(#' + intGradientId + ')');
-
-        this.svg.addEventListener("mousedown", this.onMouseDown.bind(this), false);
-        this.svg.addEventListener("touchstart", this.onTouchStart.bind(this), false);
+        this.valueHolder.setAttribute('fill', `url(#${intGradientId})`);
     }
 
     createLabel() {
@@ -95,23 +97,23 @@ class Slider {
         label.setAttribute('class', 'label');
         labels.appendChild(label);
 
-        this.value = document.createElement("div");
-        this.value.setAttribute('class', 'value');
-        this.value.innerHTML = "$";
-        label.appendChild(this.value);
+        let value = document.createElement("div");
+        value.setAttribute('class', 'value');
+        value.innerHTML = "$";
+        label.appendChild(value);
+
+        let colorBox = document.createElement("div");
+        colorBox.setAttribute('class', 'color_box')
+        colorBox.style.backgroundColor = this.options.color;
+        label.appendChild(colorBox);
+
+        let labelText = document.createElement("div");
+        labelText.setAttribute('class', 'label_text');
+        labelText.innerHTML = this.options.label;
+        label.appendChild(labelText);
 
         this.valueSpan = document.createElement("span");
-        this.value.appendChild(this.valueSpan);
-
-        this.colorBox = document.createElement("div");
-        this.colorBox.setAttribute('class', 'color_box')
-        this.colorBox.style.backgroundColor = this.options.color;
-        label.appendChild(this.colorBox);
-
-        this.labelText = document.createElement("div");
-        this.labelText.setAttribute('class', 'label_text');
-        this.labelText.innerHTML = this.options.label;
-        label.appendChild(this.labelText);
+        value.appendChild(this.valueSpan);
     }
 
     setStep() {
@@ -169,7 +171,7 @@ class Slider {
 
     onMouseDown(e) {
         e.preventDefault();
-        // we want the mouseup event to trigger anywhere on svg
+        // we want the pointer event to trigger anywhere on svg
         this.svg.style.pointerEvents = 'visiblePainted';
 
         // using a pointer to grab the exact listener upon removal
@@ -217,8 +219,8 @@ let sliders = [
     {
         container: document.getElementById('sliders'),
         color: '#796087',
-        min: 0,
-        max: 162,
+        min: 150,
+        max: 312,
         step: 2,
         radius: 200,
         label: 'Transportation'
@@ -241,8 +243,8 @@ let sliders = [
     }, {
         container: document.getElementById('sliders'),
         color: '#f09553',
-        min: 0,
-        max: 80,
+        min: 20,
+        max: 100,
         step: 2,
         radius: 95,
         label: 'Entertainment'
@@ -258,7 +260,6 @@ let sliders = [
 ];
 
 sliders.forEach(options => {
-    let slider = new Slider(options);
-    slider.init();
+    new Slider(options);
 });
 
